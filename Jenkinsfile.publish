@@ -34,29 +34,6 @@ pipeline {
       }
     }
 
-    stage('Tag and publish docs') {
-      parallel {
-        stage('Tag release') {
-          agent { label 'osx' }
-          steps {
-            prepareWorkspace()
-            sh "./build.sh publish-tag ${branch}"
-          }
-        }
-
-        stage('Publish docs') {
-          agent { label 'osx' }
-          steps {
-            prepareWorkspace()
-            unstash 'docs'
-            withAWS(credentials: 'cocoa-docs-s3-bucket', region: 'us-east-1') {
-              sh './build.sh publish-docs'
-            }
-          }
-        }
-      }
-    }
-
     stage('Create Github and Cocoapods releases') {
       parallel {
         stage('Create Github Release') {
