@@ -235,6 +235,76 @@ class AnyRealmValueObjectTests: TestCase {
     }
 }
 
+class AnyRealmValueCollectionTests: TestCase {
+    func testSetMixedCollection() {
+        let o = AnyRealmTypeObject()
+        let set = MutableSet<AnyRealmValue>()
+        set.insert(.int(5))
+        set.insert(.string("Realm"))
+        set.insert(.object(o))
+        o.anyValue.value = .set(set)
+        XCTAssertEqual(o.anyValue.value.setValue?[0], .int(5))
+        XCTAssertEqual(o.anyValue.value.setValue?[1], .string("Realm"))
+        XCTAssertEqual(o.anyValue.value.setValue?[2], .object(o))
+
+        XCTAssertEqual(o.anyValue.value.setValue?[0].intValue, 5)
+        XCTAssertEqual(o.anyValue.value.setValue?[1].stringValue, "Realm")
+        XCTAssertEqual(o.anyValue.value.setValue?[2].object(AnyRealmTypeObject.self), o)
+    }
+
+    func testDictionaryMixedCollection() {
+        let o = AnyRealmTypeObject()
+        let dictionary = Map<String, AnyRealmValue>()
+        dictionary["keyInt"] = .int(5)
+        dictionary["keyString"] = .string("Realm")
+        dictionary["keyObject"] = .object(o)
+        o.anyValue.value = .dictionary(dictionary)
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["keyInt"], .int(5))
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["keyString"], .string("Realm"))
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["keyObject"], .object(o))
+
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["keyInt"]?.intValue, 5)
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["keyString"]?.stringValue, "Realm")
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["keyObject"]?.object(AnyRealmTypeObject.self), o)
+    }
+
+    func testArrayMixedCollection() {
+        let o = AnyRealmTypeObject()
+        let list = List<AnyRealmValue>()
+        list.append(.int(5))
+        list.append(.string("Realm"))
+        list.append(.object(o))
+        o.anyValue.value = .list(list)
+        XCTAssertEqual(o.anyValue.value.listValue?[0], .int(5))
+        XCTAssertEqual(o.anyValue.value.listValue?[1], .string("Realm"))
+        XCTAssertEqual(o.anyValue.value.listValue?[2], .object(o))
+
+        XCTAssertEqual(o.anyValue.value.listValue?[0].intValue, 5)
+        XCTAssertEqual(o.anyValue.value.listValue?[1].stringValue, "Realm")
+        XCTAssertEqual(o.anyValue.value.listValue?[2].object(AnyRealmTypeObject.self), o)
+    }
+
+    func testNestedMixedCollection() {
+        let o = AnyRealmTypeObject()
+        let list = List<AnyRealmValue>()
+        list.append(.int(5))
+        let dictionary = Map<String, AnyRealmValue>()
+        dictionary["listKey"] = .list(list)
+        let set = MutableSet<AnyRealmValue>()
+        set.insert(.dictionary(dictionary))
+        o.anyValue.value = .set(set)
+        XCTAssertEqual(o.anyValue.value, .set(set))
+        XCTAssertEqual(o.anyValue.value.setValue?[0], .dictionary(dictionary))
+        XCTAssertEqual(o.anyValue.value.setValue?[0].dictionaryValue?["listKey"], .list(list))
+        XCTAssertEqual(o.anyValue.value.setValue?[0].dictionaryValue?["listKey"]?.listValue?[0], .int(5))
+
+        XCTAssertEqual(o.anyValue.value.setValue, set)
+        XCTAssertEqual(o.anyValue.value.setValue?[0].dictionaryValue, dictionary)
+        XCTAssertEqual(o.anyValue.value.setValue?[0].dictionaryValue?["listKey"]?.listValue, list)
+        XCTAssertEqual(o.anyValue.value.setValue?[0].dictionaryValue?["listKey"]?.listValue?[0].intValue, 5)
+    }
+}
+
 // MARK: - List tests
 
 class AnyRealmValueListTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase {
@@ -641,6 +711,12 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRea
             XCTAssertEqual(kvc as! String, s)
         case let .uuid(u):
             XCTAssertEqual(kvc as! UUID, u)
+        case let .set(s):
+            XCTAssertEqual(kvc as! MutableSet<AnyRealmValue>, s)
+        case let .dictionary(d):
+            XCTAssertEqual(kvc as! Map<String, AnyRealmValue>, d)
+        case let .list(l):
+            XCTAssertEqual(kvc as! List<AnyRealmValue>, l)
         }
 
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
@@ -937,6 +1013,12 @@ class AnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValue
             XCTAssertEqual(kvc as! String, s)
         case let .uuid(u):
             XCTAssertEqual(kvc as! UUID, u)
+        case let .set(s):
+            XCTAssertEqual(kvc as! MutableSet<AnyRealmValue>, s)
+        case let .dictionary(d):
+            XCTAssertEqual(kvc as! Map<String, AnyRealmValue>, d)
+        case let .list(l):
+            XCTAssertEqual(kvc as! List<AnyRealmValue>, l)
         }
     }
 

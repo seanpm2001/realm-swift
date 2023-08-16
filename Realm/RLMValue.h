@@ -22,6 +22,9 @@
 #import <Realm/RLMObjectBase.h>
 #import <Realm/RLMObjectId.h>
 #import <Realm/RLMProperty.h>
+#import <Realm/RLMSet.h>
+#import <Realm/RLMDictionary.h>
+#import <Realm/RLMArray.h>
 
 #pragma mark RLMValue
 
@@ -52,6 +55,9 @@
  `RLMObject
  `RLMObjectId`
  `RLMDecimal128`
+ `RLMSet`
+ `RLMDictionary`
+ `RLMArray`
  */
 @protocol RLMValue
 
@@ -94,4 +100,16 @@
 
 /// :nodoc:
 @interface RLMObjectId (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMSet (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMDictionary (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMArray (RLMValue)<RLMValue>
 @end

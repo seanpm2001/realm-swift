@@ -93,7 +93,10 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeLinkingObjects = 8,
 
     RLMPropertyTypeObjectId = 10,
-    RLMPropertyTypeDecimal128 = 11
+    RLMPropertyTypeDecimal128 = 11,
+    RLMPropertyTypeSet = 13,
+    RLMPropertyTypeDictionary = 14,
+    RLMPropertyTypeArray = 15,
 };
 
 #pragma mark - Notification Constants

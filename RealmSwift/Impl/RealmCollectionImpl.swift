@@ -158,6 +158,10 @@ extension RealmCollectionImpl {
 
         return SectionedResults(rlmSectionedResult: sectionedResults)
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(count)
+    }
 }
 
 // A helper protocol which lets us check for Optional in where clauses

@@ -228,7 +228,7 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmCollection: RealmCollectionBase, Equatable where Iterator == RLMIterator<Element> {
+public protocol RealmCollection: RealmCollectionBase, Hashable where Iterator == RLMIterator<Element> {
     // MARK: Properties
 
     /// The Realm which manages the collection, or `nil` for unmanaged collections.

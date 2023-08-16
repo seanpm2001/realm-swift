@@ -50,6 +50,12 @@ public extension ObjectiveCSupport {
             return u as NSUUID
         case let .object(o):
             return o
+        case let .set(s):
+            return s.rlmSet as RLMSet
+        case let .dictionary(d):
+            return d.rlmDictionary as RLMDictionary
+        case let .list(l):
+            return l.rlmArray as RLMArray
         default:
             return nil
         }
@@ -120,6 +126,21 @@ public extension ObjectiveCSupport {
                 return .none
             }
             return .object(val)
+        case RLMPropertyType.set:
+            guard let val = (value as? RLMCollection).map(MutableSet<AnyRealmValue>.init(collection:)) else {
+                return .none
+            }
+            return .set(val)
+        case RLMPropertyType.dictionary:
+            guard let val = (value as? RLMCollection).map(Map<String, AnyRealmValue>.init(collection:)) else {
+                return .none
+            }
+            return .dictionary(val)
+        case RLMPropertyType.array:
+            guard let val = (value as? RLMCollection).map(List<AnyRealmValue>.init(collection:)) else {
+                return .none
+            }
+            return .list(val)
         default:
             return .none
         }

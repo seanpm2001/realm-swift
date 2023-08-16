@@ -46,6 +46,12 @@ public enum AnyRealmValue: Hashable {
     case decimal128(Decimal128)
     /// A UUID type.
     case uuid(UUID)
+    /// Set type.
+    case set(MutableSet<AnyRealmValue>)
+    /// Dictionary type.
+    case dictionary(Map<String, AnyRealmValue>)
+    /// List type.
+    case list(List<AnyRealmValue>)
 
     /// Returns an `Int` if that is what the stored value is, otherwise `nil`.
     public var intValue: Int? {
@@ -137,6 +143,27 @@ public enum AnyRealmValue: Hashable {
             return nil
         }
         return o as? T
+    }
+
+    public var setValue: MutableSet<AnyRealmValue>? {
+        guard case let .set(i) = self else {
+            return nil
+        }
+        return i
+    }
+
+    public var dictionaryValue: Map<String, AnyRealmValue>? {
+        guard case let .dictionary(i) = self else {
+            return nil
+        }
+        return i
+    }
+
+    public var listValue: List<AnyRealmValue>? {
+        guard case let .list(i) = self else {
+            return nil
+        }
+        return i
     }
 
     /// Returns a `DynamicObject` if the stored value is an `Object`, otherwise `nil`.

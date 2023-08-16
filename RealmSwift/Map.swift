@@ -779,6 +779,12 @@ public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftColle
     }
 }
 
+extension Map: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(keys.count)
+    }
+}
+
 // MARK: - Codable
 
 extension Map: Decodable where Key: Decodable, Value: Decodable {

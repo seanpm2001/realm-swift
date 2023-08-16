@@ -122,3 +122,33 @@
 }
 
 @end
+
+#pragma mark RLMSet
+
+@implementation RLMSet (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeSet;
+}
+
+@end
+
+#pragma mark RLMDictionary
+
+@implementation RLMDictionary (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeDictionary;
+}
+
+@end
+
+#pragma mark RLMArray
+
+@implementation RLMArray (RLMValue)
+
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeArray;
+}
+
+@end
