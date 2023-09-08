@@ -919,29 +919,14 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "update-core-revision")
-        version="$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-
-        git clone https://github.com/realm/realm-core.git
-        cd realm-core
-        git checkout v$version
-        last_commit=$(git rev-parse HEAD);
-        cd ..
-        sed -i '' "s/\"revision\" : .*,/\"revision\" : \"$last_commit\",/" examples/installation/SwiftPackageManagerDynamic.notxcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
-        rm -rf realm-core
-        exit 0
-        ;;
-
     "set-core-version")
         new_version="$2"
         old_version="$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
 
         sed -i '' "s/^REALM_CORE_VERSION=.*/REALM_CORE_VERSION=$new_version/" dependencies.list
         sed -i '' "s/^let coreVersion =.*/let coreVersion = Version(\"$new_version\")/" Package.swift
-        sed -i '' "s/\"version\" : .*/\"version\" : \"$new_version\",/" examples/installation/SwiftPackageManagerDynamic.notxcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
         sed -i '' "s/Upgraded realm-core from ? to ?/Upgraded realm-core from $old_version to $new_version/" CHANGELOG.md
 
-        update-core-revision
         exit 0
         ;;
 
