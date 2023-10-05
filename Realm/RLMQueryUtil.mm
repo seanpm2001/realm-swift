@@ -19,6 +19,7 @@
 #import "RLMQueryUtil.hpp"
 
 #import "RLMAccessor.hpp"
+#import "RLMGeospatial_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMPredicateUtil.hpp"
@@ -26,6 +27,7 @@
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
 
+#import <realm/geospatial.hpp>
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
 #import <realm/query_engine.hpp>
@@ -1547,11 +1549,21 @@ void QueryBuilder::apply_value_expression(KeyPath&& kp, id value, NSComparisonPr
 
     // turn "key.path IN collection" into ored together ==. "collection IN key.path" is handled elsewhere.
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
-        process_or_group(m_query, value, [&](id item) {
-            id normalized = value_from_constant_expression_or_value(item);
-            column.validate_comparison(normalized);
-            add_constraint(NSEqualToPredicateOperatorType, pred.options, column, normalized);
-        });
+        if ([value isKindOfClass:[RLMGeospatial class]]) {
+            RLMGeospatial *geospatial = (RLMGeospatial *)value;
+            auto geoQuery = column.resolve<Link>().geo_within(geospatial.geoSpatial);
+            m_query.and_query(geoQuery);
+        } else if ([value conformsToProtocol:@protocol(RLMSwiftGeospatial)]) {
+            id<RLMSwiftGeospatial> geospatial = (id<RLMSwiftGeospatial>) value;
+            auto geoQuery = column.resolve<Link>().geo_within(geospatial._convertedValue.geoSpatial);
+            m_query.and_query(geoQuery);
+        } else {
+            process_or_group(m_query, value, [&](id item) {
+                id normalized = value_from_constant_expression_or_value(item);
+                column.validate_comparison(normalized);
+                add_constraint(NSEqualToPredicateOperatorType, pred.options, column, normalized);
+            });
+        }
         return;
     }
 
