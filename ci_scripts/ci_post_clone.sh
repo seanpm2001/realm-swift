@@ -40,9 +40,6 @@ install_dependencies() {
     elif [[ "$$CI_WORKFLOW" = *"xcode"* ]] || [[ "$target" = "xcframework"* ]]; then
         install_ruby
     fi
-
-    gem install xcpretty -v ${XCPRETTY_VERSION}
-    echo ">>> Using ruby version $(ruby -v)"
 }
 
 install_ruby() {
