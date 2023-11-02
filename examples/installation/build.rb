@@ -141,10 +141,6 @@ def download_realm(platform, method, static)
       FileUtils.mkdir_p "#{project}.xcodeproj"
       File.symlink "../#{project}.notxcodeproj/project.pbxproj",
                  "#{project}.xcodeproj/project.pbxproj"
-
-      FileUtils.mkdir_p "#{project}.xcodeproj/project.xcworkspace/xcshareddata/swiftpm"
-      FileUtils.cp "#{project}.notxcodeproj/project.notxcworkspace/xcshareddata/swiftpm/Package.resolved",
-                 "#{project}.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
     end
 
     # Update the XcodeProj to reference the requested branch or version
@@ -156,13 +152,9 @@ def download_realm(platform, method, static)
       replace_in_file "#{project}.xcodeproj/project.pbxproj",
       /(branch|version) = .*;/, "branch = #{TEST_BRANCH};",
       /kind = .*;/, "kind = branch;"
-      swift_revision = ENV['CI_COMMIT'] ? ENV['CI_COMMIT'] : ENV['GITHUB_PR_HEAD_SHA']
-      replace_in_file "#{project}.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
-      /\"branch\" : \"master\"/, "\"branch\" : \"#{TEST_BRANCH}\"",
-      /\"revision\" : \"swift\"/, "\"revision\" : \"#{swift_revision}\""
     end
 
-    sh 'xcodebuild', '-project', "#{project}.xcodeproj", '-resolvePackageDependencies'
+    sh 'xcodebuild', '-project', "#{project}.xcodeproj", '-resolvePackageDependencies', '-IDEPackageOnlyUseVersionsFromResolvedFile=NO', '-IDEDisableAutomaticPackageResolution=NO'
 
   when 'xcframework'
     # If we're testing a branch then we should already have a built zip

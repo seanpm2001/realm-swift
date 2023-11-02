@@ -1,20 +1,5 @@
 #!/bin/sh
 
-set -o pipefail
-
-# Set the -e flag to stop running the script in case a command returns
-# a non-zero exit code.
-set -e
-
-# Print env
-env
-
-# Setup environment
-echo 'export GEM_HOME=$HOME/gems' >>~/.bash_profile
-echo 'export PATH=$HOME/gems/bin:$PATH' >>~/.bash_profile
-export GEM_HOME=$HOME/gems
-export PATH="$GEM_HOME/bin:$PATH"
-
 ######################################
 # Dependency Installer
 ######################################
@@ -22,6 +7,7 @@ export PATH="$GEM_HOME/bin:$PATH"
 JAZZY_VERSION="0.14.4"
 RUBY_VERSION="3.1.2"
 XCPRETTY_VERSION="0.3.0"
+COCOAPODS_VERSION="1.14.2"
 
 install_dependencies() {
     echo ">>> Installing dependencies for ${CI_WORKFLOW}"
@@ -30,13 +16,12 @@ install_dependencies() {
 
     if [[ "$CI_WORKFLOW" == "docs"* ]]; then
         install_ruby
-        gem install activesupport -v 7.0.8 # Workaround until this is fixed https://github.com/realm/jazzy/issues/1370
         gem install jazzy -v ${JAZZY_VERSION}
     elif [[ "$CI_WORKFLOW" == "swiftlint"* ]]; then
         brew install swiftlint
     elif [[ "$CI_WORKFLOW" == "cocoapods"* ]]; then
         install_ruby
-        brew install cocoapods
+        gem install cocoapods -v ${COCOAPODS_VERSION}
     elif [[ "$$CI_WORKFLOW" = *"xcode"* ]] || [[ "$target" = "xcframework"* ]]; then
         install_ruby
     fi
@@ -52,14 +37,51 @@ install_ruby() {
     eval "$(rbenv init -)"
 }
 
+update_scheme_configuration() {
+    local target="$1"
+    configuration="Release"
+    case "$target" in
+        *-debug)
+            configuration="Debug"
+            ;;
+        *-static)
+            configuration="Static"
+            ;;
+    esac
+
+    schemes=("RealmSwift" "Realm" "Object Server Tests" "SwiftUITestHost" "SwiftUISyncTestHost")
+    for ((i = 0; i < ${#schemes[@]}; i++)) do
+        filename="Realm.xcodeproj/xcshareddata/xcschemes/${schemes[$i]}.xcscheme"
+        sed -i '' "s/buildConfiguration = \"Debug\"/buildConfiguration = \"$configuration\"/" "$filename"
+    done
+}
+
+set -o pipefail
+
+# Set the -e flag to stop running the script in case a command returns
+# a non-zero exit code.
+set -e
+
+# Print env
+env
+
+# Setup environment
+echo 'export GEM_HOME=$HOME/gems' >>~/.bash_profile
+echo 'export PATH=$HOME/gems/bin:$PATH' >>~/.bash_profile
+export GEM_HOME=$HOME/gems
+export PATH="$GEM_HOME/bin:$PATH"
+
 # Dependencies
 install_dependencies
 
 # CI Workflows
 cd ..
 
-export target=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
-sh -x build.sh ci-pr | ts
+# Get target name
+TARGET=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
 
-# Print environment at the end of ci_post_clone.sh
-env
+# Update schemes configuration
+update_scheme_configuration ${TARGET}
+
+export target="${TARGET}"
+sh -x build.sh ci-pr | ts
