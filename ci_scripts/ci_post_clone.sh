@@ -9,9 +9,6 @@ set -e
 # Print env
 env
 
-# Create CoreSimulator.log
-touch ~/Library/Logs/CoreSimulator/CoreSimulator.log || true
-
 # Setup environment
 echo 'export GEM_HOME=$HOME/gems' >>~/.bash_profile
 echo 'export PATH=$HOME/gems/bin:$PATH' >>~/.bash_profile

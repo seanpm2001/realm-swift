@@ -1077,10 +1077,6 @@ case "$COMMAND" in
                 sh build.sh setup-baas
             fi
 
-            # Reset CoreSimulator.log
-            mkdir -p ~/Library/Logs/CoreSimulator
-            echo > ~/Library/Logs/CoreSimulator/CoreSimulator.log
-
             failed=
             sh build.sh "verify-$target" 2>&1 | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
             if [ "$failed" = "1" ] && grep -E 'DTXProxyChannel|DTXChannel|out of date and needs to be rebuilt|operation never finished bootstrapping|thread is already initializing this class' build/build.log ; then
@@ -1090,7 +1086,7 @@ case "$COMMAND" in
                 fi
                 failed=0
                 sh build.sh "verify-$target" | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
-            elif [ "$failed" = "1" ] && tail ~/Library/Logs/CoreSimulator/CoreSimulator.log | grep -E "Operation not supported|Failed to lookup com.apple.coreservices.lsuseractivity.simulatorsupport"; then
+            elif [ "$failed" = "1" ]; then
                 echo "Known Xcode error detected. Running job again."
                 failed=0
                 sh build.sh "verify-$target" | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
@@ -1098,7 +1094,6 @@ case "$COMMAND" in
             if [ "$failed" = "1" ]; then
                 set +e
                 printf "%s" "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log
-                printf "%s" "\n\n***\nCoreSimulator.log\n***\n\n" && cat ~/Library/Logs/CoreSimulator/CoreSimulator.log
                 exit 1
             fi
         fi
