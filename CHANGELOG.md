@@ -1,13 +1,27 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Sync subscription change notifications are now cancelled if the sync session
+  becomes inactive as is done for upload and download progress handlers. If a
+  fatal sync error occurs it will be reported to the completion handler, and
+  if the user is logged out an "operation cancelled" error will be reported.
+  Non-fatal errors are unchanged (i.e. the sync client internally retries
+  without reporting errors). Previously fatal errors would result in the
+  completion handler never being called.
+  ([Core #7073](https://github.com/realm/realm-core/pull/7073))
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Flexible sync subscriptions would sometimes not be sent to the server if they
+  were created while the client was downloading the bootstrap state for a
+  previous subscription change and the bootstrap did not complete successfully.
+  ([Core #7077](https://github.com/realm/realm-core/issues/7077), since v10.21.1)
+* Flexible sync subscriptions would sometimes not be sent to the server if an
+  UPLOAD message was sent immediately after the subscription was created.
+  ([Core #7076](https://github.com/realm/realm-core/issues/7076), since v10.43.1)
+* Creating or removing flexible sync subscriptions while a client reset with
+  automatic recovery enabled was being processed in the background would
+  occasionally crash with a `KeyNotFound` exception.
+  ([#7090](https://github.com/realm/realm-core/issues/7090), since v10.28.2)
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
@@ -19,6 +33,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Internal
 * Upgraded realm-core from ? to ?
 * Migrated our current CI Pipelines to Xcode Cloud.
+* Upgraded realm-core from 13.23.1 to 13.23.3
 
 10.44.0 Release notes (2023-10-29)
 =============================================================
