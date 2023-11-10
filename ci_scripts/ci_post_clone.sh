@@ -81,7 +81,7 @@ cd ..
 TARGET=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
 
 if [ "$TARGET" == "GenerateDocsTest" ]; then
-    exit 1
+    exit 0
 fi    
 
 # Update schemes configuration
