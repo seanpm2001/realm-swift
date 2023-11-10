@@ -22,6 +22,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = ACB76B7B2AA9D9A600C59983 /* Build configuration list for PBXAggregateTarget "CI" */;
 			buildPhases = (
+				AC9F6C312AFE6F8100465C73 /* ShellScript */,
 			);
 			dependencies = (
 			);
@@ -2346,6 +2347,23 @@
 			shellPath = /bin/sh;
 			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		AC9F6C312AFE6F8100465C73 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/bin/bash -l";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nsh build.sh package-docs\n";
 		};
 		E8267FB81D90B79000E001C7 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
